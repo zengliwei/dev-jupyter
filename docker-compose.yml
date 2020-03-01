@@ -8,11 +8,9 @@ services:
     build:
       context: ./images/web
       args:
-        NB_USER: ${NB_USER}
         SSH_PSWD: ${SSH_PSWD}
     restart: ${RESTART}
     environment:
-      NB_USER: ${NB_USER}
       RESTARTABLE: 'yes'
     networks:
       - network
