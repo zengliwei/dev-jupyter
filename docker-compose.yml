@@ -12,6 +12,7 @@ services:
     restart: ${RESTART}
     environment:
       RESTARTABLE: 'yes'
+      NOTEBOOK_TOKEN: ${NOTEBOOK_TOKEN}
     networks:
       - network
 

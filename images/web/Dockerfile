@@ -18,6 +18,7 @@ RUN apt-get update \
 #
 # Prepare for start
 #
+ENV NOTEBOOK_TOKEN=""
 COPY docker-bootstrap /usr/local/bin/
 
 CMD ["docker-bootstrap"]
