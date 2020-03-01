@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  web:
+    container_name: ${COMPOSE_PROJECT_NAME}
+    image: jupyter_tensorflow
+    build:
+      context: ./images/web
+      args:
+        NB_USER: ${NB_USER}
+        SSH_PSWD: ${SSH_PSWD}
+    restart: ${RESTART}
+    environment:
+      NB_USER: ${NB_USER}
+      RESTARTABLE: 'yes'
+    networks:
+      - network
+
+networks:
+
+  network:
+    external:
+      name: ${NETWORK}

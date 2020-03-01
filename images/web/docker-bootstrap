@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/etc/init.d/ssh start;
+/usr/local/bin/start-notebook.sh;
