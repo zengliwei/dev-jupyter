@@ -1,2 +1,3 @@
-# dev-jupyter-tensorflow
-Jupyter notebook for tensorflow base on dev
+# dev-jupyter
+
+Jupyter notebook based on dev
