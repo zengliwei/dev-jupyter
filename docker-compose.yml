@@ -3,7 +3,7 @@ version: "3"
 services:
 
   web:
-    container_name: ${COMPOSE_PROJECT_NAME}
+    container_name: ${COMPOSE_PROJECT_NAME}_web
     image: jupyter_tensorflow
     build:
       context: ./images/web

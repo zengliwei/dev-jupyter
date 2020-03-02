@@ -82,6 +82,14 @@ goto :EOF
   )
 
   ::::
+  :: Create SSL certificate
+  ::
+  docker exec dev_router /usr/bin/openssl genrsa -out /etc/ssl/certs/%domain%.key 2048
+  docker exec dev_router /usr/bin/openssl req -new -nodes -key /etc/ssl/certs/%domain%.key -out /etc/ssl/certs/%domain%.csr -subj /C=CN/ST=State/L=Locality/O=Organization/CN=%domain%
+  docker exec dev_router /usr/bin/openssl x509 -req -days 3650 -signkey /etc/ssl/certs/%domain%.key -in /etc/ssl/certs/%domain%.csr -out /etc/ssl/certs/%domain%.crt
+  docker exec dev_router rm /etc/ssl/certs/%domain%.csr
+
+  ::::
   :: Create containers
   ::
   docker-compose up --no-recreate -d
