@@ -66,7 +66,7 @@ goto :EOF
     if %%i == %domain%.conf set proxySet=1
   )
   if %proxySet% == 0 (
-    for /f "tokens=1* delims=:" %%k in ( 'findstr /n .* .\config\proxy.conf' ) do (
+    for /f "tokens=1* delims=:" %%k in ( 'findstr /n .* .\config\router\proxy.conf' ) do (
       set "line=%%l"
       setLocal enableDelayedExpansion
       if "!line!" == "" (
@@ -79,15 +79,27 @@ goto :EOF
       endLocal
     )
     move proxy.conf.tmp ..\..\config\router\%domain%
-  )
 
-  ::::
-  :: Create SSL certificate
-  ::
-  docker exec dev_router /usr/bin/openssl genrsa -out /etc/ssl/certs/%domain%.key 2048
-  docker exec dev_router /usr/bin/openssl req -new -nodes -key /etc/ssl/certs/%domain%.key -out /etc/ssl/certs/%domain%.csr -subj /C=CN/ST=State/L=Locality/O=Organization/CN=%domain%
-  docker exec dev_router /usr/bin/openssl x509 -req -days 3650 -signkey /etc/ssl/certs/%domain%.key -in /etc/ssl/certs/%domain%.csr -out /etc/ssl/certs/%domain%.crt
-  docker exec dev_router rm /etc/ssl/certs/%domain%.csr
+    ::::
+    :: Create SSL certificate
+    ::
+    for /f "tokens=1* delims=:" %%k in ( 'findstr /n .* .\config\router\ssl.conf' ) do (
+      set "line=%%l"
+      setLocal enableDelayedExpansion
+      if "!line!" == "" (
+        echo.>> ssl.conf.tmp
+      ) else (
+        set line=!line:project_domain=%domain%!
+        echo !line!>> ssl.conf.tmp
+      )
+      endLocal
+    )
+    move ssl.conf.tmp ..\..\config\ssl\ext.cnf
+    docker exec dev_router /usr/bin/openssl req -x509 -nodes -sha256 -newkey rsa:2048 -outform PEM -days 3650 -addext "basicConstraints=critical, CA:true" -subj "/C=CN/ST=State/L=Locality/O=Organization/CN=Local Dev" -keyout ca.pvk -out /etc/ssl/certs/%domain%.browser.cer
+    docker exec dev_router /usr/bin/openssl req -nodes -sha256 -newkey rsa:2048 -out server.req -keyout /etc/ssl/certs/%domain%.pvk -subj "/C=CN/ST=State/L=Locality/O=Organization/CN=%domain%"
+    docker exec dev_router /usr/bin/openssl x509 -req -sha256 -days 3650 -set_serial 0x1111 -extfile /etc/ssl/certs/ext.cnf -in server.req -CAkey ca.pvk -CA /etc/ssl/certs/%domain%.browser.cer -out /etc/ssl/certs/%domain%.cer
+    docker exec dev_router rm ca.pvk server.req /etc/ssl/certs/ext.cnf
+  )
 
   ::::
   :: Create containers
